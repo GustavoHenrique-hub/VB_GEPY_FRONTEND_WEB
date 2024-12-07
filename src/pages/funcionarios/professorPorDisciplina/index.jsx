@@ -19,7 +19,7 @@ import AddIcon from "@mui/icons-material/Add";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 
 import DataGridForDisciplinas from "../../../components/dataGrids/dataGridForDisciplinas/index";
-import DataGridForFuncionariosOfDisciplina from "../../../components/dataGrids/dataGridForFuncionariosOfDisciplina";
+import DataGridForFuncionariosOfDisciplina from "../../../components/dataGrids/dataGridForFuncionariosOfDisciplina/index";
 import { CustomTheme } from "../../../assets/colorsPallete/colorsPallete";
 import { CustomTextField } from "../../../components/textFields/customTextField";
 import { SubmitButton } from "../../../components/buttons/submitButton";
@@ -183,8 +183,9 @@ export default function ProfessorPorDisciplina() {
             Swal.fire({
               position: "center",
               icon: "error",
-              text: data.error,
-              showConfirmButton: true,
+              text: data.message,
+              showConfirmButton: false,
+              timer: 1800,
             });
           }
         });
@@ -211,11 +212,7 @@ export default function ProfessorPorDisciplina() {
   const [stateProfessorDisciplinaArray, setStateProfessorDisciplinaArray] =
     useState([]);
 
-  useEffect(() => {
-    if (stateDisciplinaId) {
-      handleGetProfessorOfDisciplina(); // Chama a função quando stateDisciplinaId mudar
-    }
-  }, [stateDisciplinaId]);
+  
 
   const handleGetProfessorOfDisciplina = async () => {
     setStateOpenListModal(true);
@@ -509,6 +506,11 @@ export default function ProfessorPorDisciplina() {
                 {/* AQUI */}
                 <div className="professor-por-disciplina-modal-content-top-right">
                     <DataGridForFuncionariosOfDisciplina
+                     pageSize={10} // Limita a quantidade de linhas por página
+                     rowsPerPageOptions={[5, 10, 20]} // Define as opções de quantidade de linhas por página
+                     pagination // Habilita a paginação
+                     autoHeight={false} // Não ajusta a altura automaticamente
+                     height={400}
                       rows={stateProfessorDisciplinaArray}
                       columns={columnsForProfessorPorDisciplina}
                     />
