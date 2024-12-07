@@ -1,5 +1,5 @@
 import "./style.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Box,
@@ -19,17 +19,15 @@ import AddIcon from "@mui/icons-material/Add";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 
 import DataGridForDisciplinas from "../../../components/dataGrids/dataGridForDisciplinas/index";
+import DataGridForFuncionariosOfDisciplina from "../../../components/dataGrids/dataGridForFuncionariosOfDisciplina";
 import { CustomTheme } from "../../../assets/colorsPallete/colorsPallete";
 import { CustomTextField } from "../../../components/textFields/customTextField";
 import { SubmitButton } from "../../../components/buttons/submitButton";
 import { BackButton } from "../../../components/buttons/backButton";
 import { SearchButton } from "../../../components/buttons/searchButton";
 import Swal from "sweetalert2";
-import DataGridForFuncionarios from "../../../components/dataGrids/dataGridForFuncionarios";
 
 export default function ProfessorPorDisciplina() {
-  
-
   const columnsForProfessorPorDisciplina = [
     {
       field: "id",
@@ -185,9 +183,8 @@ export default function ProfessorPorDisciplina() {
             Swal.fire({
               position: "center",
               icon: "error",
-              text: data.message,
-              showConfirmButton: false,
-              timer: 1800,
+              text: data.error,
+              showConfirmButton: true,
             });
           }
         });
@@ -214,6 +211,12 @@ export default function ProfessorPorDisciplina() {
   const [stateProfessorDisciplinaArray, setStateProfessorDisciplinaArray] =
     useState([]);
 
+  useEffect(() => {
+    if (stateDisciplinaId) {
+      handleGetProfessorOfDisciplina(); // Chama a função quando stateDisciplinaId mudar
+    }
+  }, [stateDisciplinaId]);
+
   const handleGetProfessorOfDisciplina = async () => {
     setStateOpenListModal(true);
     setStateGetAllProfessorLoading(true);
@@ -221,28 +224,22 @@ export default function ProfessorPorDisciplina() {
 
     try {
       await fetch(urlToGetFuncionario)
-      .then((response) => {
-        return response.json()
-      }).then((data) => {
-        // Ajuste conforme a estrutura real
-        data.map((item, index) => {
-          tempProfessorDisciplinaArray.push({
-            id: item.id,
-            nome: item.professor.nomeCompleto,
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          // Ajuste conforme a estrutura real
+          data.map((item, index) => {
+            tempProfessorDisciplinaArray.push({
+              id: item.id,
+              nome: item.professor.nomeCompleto,
+            });
           });
         });
-      });      
       setStateProfessorDisciplinaArray(tempProfessorDisciplinaArray);
       console.log(stateProfessorDisciplinaArray);
     } catch (err) {
       console.error("Erro ao buscar Funcionarios:", err);
-      Swal.fire({
-        position: "top-right",
-        icon: "error",
-        text: "Erro ao buscar Funcionarios!",
-        showConfirmButton: false,
-        timer: 2000,
-      });
     } finally {
       setStateGetAllProfessorLoading(false); // Desativa o estado de loading
     }
@@ -303,9 +300,9 @@ export default function ProfessorPorDisciplina() {
               }}
               onClick={() => {
                 //handleFillModalWithRowData(params.row);
-                handleGetProfessorOfDisciplina()
-                handleGetDisciplina()
-                setStateDisciplinaId(params.row.id)
+                handleGetProfessorOfDisciplina();
+                handleGetDisciplina();
+                setStateDisciplinaId(params.row.id);
                 console.log(params.row.id);
               }}
             >
@@ -509,11 +506,12 @@ export default function ProfessorPorDisciplina() {
                     ))}
                   </CustomTextField>
                 </div>
+                {/* AQUI */}
                 <div className="professor-por-disciplina-modal-content-top-right">
-                  <DataGridForFuncionarios
-                    rows={stateProfessorDisciplinaArray}
-                    columns={columnsForProfessorPorDisciplina}
-                  />
+                    <DataGridForFuncionariosOfDisciplina
+                      rows={stateProfessorDisciplinaArray}
+                      columns={columnsForProfessorPorDisciplina}
+                    />
                 </div>
               </div>
               <div className="professor-por-disciplina-modal-content-bottom">
